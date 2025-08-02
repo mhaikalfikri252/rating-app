@@ -2,8 +2,8 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Form Penilaian Pelayanan</title>
     <style>
         body {
@@ -19,6 +19,7 @@
             border-radius: 10px;
             padding: 2rem;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .emoji-group {
@@ -57,23 +58,49 @@
         button:hover {
             background-color: #45a049;
         }
+
+        #responseText {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h2>Penilaian Pelayanan</h2>
-        <form id="feedbackForm"
-            action="https://script.google.com/macros/s/AKfycbxQj3rmlXNTAV5vNSqxaQkDafW4jNiRJOWC2BKCO4aBy8DEGCR0V9IhbryfgCKLH_lkGQ/exec"
-            method="POST">
-
+        <form id="feedbackForm">
             <div class="emoji-group" id="emojiGroup">
                 <span class="emoji" data-value="Senang">😊</span>
                 <span class="emoji" data-value="Netral">😐</span>
                 <span class="emoji" data-value="Buruk">😞</span>
             </div>
 
-            <input type="hidden" name="emot" id="emotInput" required>
+            <input type="hidden" name="emot" id="emotInput" required />
 
             <label for="pegawai">Nama Pegawai:</label>
             <select name="pegawai" id="pegawai" required>
@@ -91,41 +118,86 @@
 
             <button type="submit">Kirim</button>
         </form>
-        <p id="responseText" style="color: green;"></p>
+
+        <div class="loader" id="loader"></div>
+        <p id="responseText"></p>
     </div>
 
     <script>
-        const emojis = document.querySelectorAll('.emoji');
-        const emotInput = document.getElementById('emotInput');
+        const form = document.getElementById("feedbackForm");
+        const emojis = document.querySelectorAll(".emoji");
+        const emotInput = document.getElementById("emotInput");
+        const loader = document.getElementById("loader");
+        const responseText = document.getElementById("responseText");
 
-        emojis.forEach(el => {
-            el.addEventListener('click', () => {
-                emojis.forEach(e => e.classList.remove('selected'));
-                el.classList.add('selected');
+        // emoji click
+        emojis.forEach((el) => {
+            el.addEventListener("click", () => {
+                emojis.forEach((e) => e.classList.remove("selected"));
+                el.classList.add("selected");
                 emotInput.value = el.dataset.value;
             });
         });
 
-        const form = document.getElementById('feedbackForm');
-        form.addEventListener('submit', async (e) => {
+        // form submit
+        form.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const data = new FormData(form);
-            const payload = Object.fromEntries(data.entries());
 
-            const res = await fetch('YOUR_WEBHOOK_URL', {
-                method: 'POST',
-                body: JSON.stringify(payload),
-                headers: { 'Content-Type': 'application/json' }
-            });
+            // validasi manual
+            const pegawai = form.pegawai.value;
+            const ulasan = form.ulasan.value.trim();
+            const emot = emotInput.value;
 
-            if (res.ok) {
-                document.getElementById('responseText').innerText = "Terima kasih atas penilaiannya!";
-                form.reset();
-                document.querySelectorAll('.emoji').forEach(e => e.classList.remove('selected'));
-            } else {
-                document.getElementById('responseText').innerText = "Gagal mengirim. Coba lagi.";
+            if (!emot) {
+                showMessage("Silakan pilih ekspresi penilaian.", "red");
+                return;
+            }
+
+            if (!pegawai) {
+                showMessage("Silakan pilih nama pegawai.", "red");
+                return;
+            }
+
+            if (ulasan.length < 10) {
+                showMessage("Ulasan minimal 10 karakter.", "red");
+                return;
+            }
+
+            // tampilkan loader
+            loader.style.display = "block";
+            responseText.style.display = "none";
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch("https://script.google.com/macros/s/AKfycbxQj3rmlXNTAV5vNSqxaQkDafW4jNiRJOWC2BKCO4aBy8DEGCR0V9IhbryfgCKLH_lkGQ/exec", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    showMessage("✅ Terima kasih! Penilaian Anda telah terkirim.", "green");
+                    form.reset();
+                    emotInput.value = "";
+                    emojis.forEach((e) => e.classList.remove("selected"));
+                } else {
+                    showMessage("❌ Gagal mengirim. Silakan coba lagi.", "red");
+                }
+            } catch (error) {
+                showMessage("❌ Terjadi kesalahan koneksi. Periksa jaringan Anda.", "red");
+            } finally {
+                loader.style.display = "none";
             }
         });
+
+        function showMessage(msg, color) {
+            responseText.textContent = msg;
+            responseText.style.color = color;
+            responseText.style.display = "block";
+            setTimeout(() => {
+                responseText.style.display = "none";
+            }, 5000);
+        }
     </script>
 </body>
 
