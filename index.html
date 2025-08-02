@@ -28,8 +28,11 @@
         }
 
         .emot-group {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
             margin: 20px 0;
+            flex-wrap: wrap;
         }
 
         .emot {
@@ -54,7 +57,7 @@
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            font-size: 16px;
+            font-size: 18px;
             border-radius: 8px;
             border: 1px solid #ccc;
         }
@@ -121,6 +124,25 @@
         .notif.error {
             color: red;
         }
+
+        @media (min-width: 600px) and (max-width: 1024px) {
+            body {
+                padding: 30px;
+            }
+
+            .container {
+                padding: 40px;
+            }
+
+            .emot {
+                font-size: 40px;
+            }
+
+            button {
+                font-size: 18px;
+                padding: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -140,9 +162,12 @@
             <label>Nama Pegawai:</label>
             <select name="pegawai" required>
                 <option value="">-- Pilih Pegawai --</option>
+                <option value="Oni Indah Reflin">Oni Indah Reflin</option>
                 <option value="Maulidar">Maulidar</option>
-                <option value="Zikri">Zikri</option>
-                <option value="Rina">Rina</option>
+                <option value="Ella Putri Maghfira">Ella Putri Maghfira</option>
+                <option value="Fathur Maulana">Fathur Maulana</option>
+                <option value="Rizal Fahmi">Rizal Fahmi</option>
+                <option value="M Haikal Fikri">M Haikal Fikri</option>
             </select>
 
             <label>Ulasan:</label>
@@ -163,6 +188,9 @@
         const emotInput = document.getElementById("emotInput");
         const loader = document.getElementById("loader");
         const notif = document.getElementById("notif");
+        const submitBtn = form.querySelector("button");
+        const pegawai = form.querySelector("select[name='pegawai']");
+        const ulasan = form.querySelector("textarea[name='ulasan']");
 
         // Pilih emoji
         emotIcons.forEach(icon => {
@@ -173,45 +201,47 @@
             });
         });
 
-        form.addEventListener("submit", async (e) => {
+        form.addEventListener("submit", async function (e) {
             e.preventDefault();
-            notif.textContent = "";
+
             if (!emotInput.value) {
-                notif.textContent = "⚠️ Harap pilih ekspresi kepuasan!";
+                notif.textContent = "❗ Silakan pilih emotikon.";
                 notif.className = "notif error";
                 return;
             }
 
-            loader.style.display = "block";
+            submitBtn.disabled = true;
+            loader.style.display = "inline-block";
+            notif.textContent = "";
 
-            const payload = {
-                emot: emotInput.value,
-                nama: form.pegawai.value,
-                ulasan: form.ulasan.value.trim()
-            };
+            const formData = new FormData();
+            formData.append("emot", emotInput.value);
+            formData.append("pegawai", pegawai.value);
+            formData.append("ulasan", ulasan.value);
 
             try {
-                const response = await fetch("https://script.google.com/macros/s/AKfycbxQj3rmlXNTAV5vNSqxaQkDafW4jNiRJOWC2BKCO4aBy8DEGCR0V9IhbryfgCKLH_lkGQ/exec", {
+                const response = await fetch("https://script.google.com/macros/s/AKfycbyLK-431Ezkwaj4Qr52oRgrfiHIbOyXORf86vZdpKW8gBt6szoBQzi5bTGIxvKwnZBhBw/exec", {
                     method: "POST",
-                    body: JSON.stringify(payload),
-                    headers: { "Content-Type": "application/json" }
+                    body: formData,
                 });
 
-                const text = await response.text();
-                if (text === "OK") {
-                    notif.textContent = "✅ Terima kasih, ulasan Anda berhasil dikirim!";
+                const result = await response.text();
+                if (result === "OK") {
+                    notif.textContent = "✅ Terima kasih atas penilaiannya!";
                     notif.className = "notif success";
                     form.reset();
                     emotIcons.forEach(i => i.classList.remove("selected"));
                     emotInput.value = "";
                 } else {
-                    throw new Error("Gagal menyimpan data");
+                    notif.textContent = "❌ Gagal mengirim data. Coba lagi.";
+                    notif.className = "notif error";
                 }
             } catch (error) {
-                notif.textContent = "❌ Terjadi kesalahan koneksi. Periksa jaringan Anda.";
+                notif.textContent = "❌ Gagal koneksi ke server.";
                 notif.className = "notif error";
             } finally {
                 loader.style.display = "none";
+                submitBtn.disabled = false;
             }
         });
     </script>
