@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form Penilaian Pelayanan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 1rem;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .emoji-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .emoji {
+            transition: transform 0.2s;
+        }
+
+        .emoji.selected {
+            transform: scale(1.4);
+        }
+
+        select,
+        textarea,
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Penilaian Pelayanan</h2>
+        <form id="feedbackForm"
+            action="https://script.google.com/macros/s/AKfycbxQj3rmlXNTAV5vNSqxaQkDafW4jNiRJOWC2BKCO4aBy8DEGCR0V9IhbryfgCKLH_lkGQ/exec"
+            method="POST">
+
+            <div class="emoji-group" id="emojiGroup">
+                <span class="emoji" data-value="Senang">😊</span>
+                <span class="emoji" data-value="Netral">😐</span>
+                <span class="emoji" data-value="Buruk">😞</span>
+            </div>
+
+            <input type="hidden" name="emot" id="emotInput" required>
+
+            <label for="pegawai">Nama Pegawai:</label>
+            <select name="pegawai" id="pegawai" required>
+                <option value="">-- Pilih Pegawai --</option>
+                <option>Oni Indah Reflin</option>
+                <option>Maulidar</option>
+                <option>Ella Putri Magfirah</option>
+                <option>Fathur Maulana</option>
+                <option>Rizal Fahmi</option>
+                <option>M Haikal Fikri</option>
+            </select>
+
+            <label for="ulasan">Ulasan:</label>
+            <textarea name="ulasan" id="ulasan" rows="4" placeholder="Tulis ulasan Anda..." required></textarea>
+
+            <button type="submit">Kirim</button>
+        </form>
+        <p id="responseText" style="color: green;"></p>
+    </div>
+
+    <script>
+        const emojis = document.querySelectorAll('.emoji');
+        const emotInput = document.getElementById('emotInput');
+
+        emojis.forEach(el => {
+            el.addEventListener('click', () => {
+                emojis.forEach(e => e.classList.remove('selected'));
+                el.classList.add('selected');
+                emotInput.value = el.dataset.value;
+            });
+        });
+
+        const form = document.getElementById('feedbackForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = new FormData(form);
+            const payload = Object.fromEntries(data.entries());
+
+            const res = await fetch('YOUR_WEBHOOK_URL', {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (res.ok) {
+                document.getElementById('responseText').innerText = "Terima kasih atas penilaiannya!";
+                form.reset();
+                document.querySelectorAll('.emoji').forEach(e => e.classList.remove('selected'));
+            } else {
+                document.getElementById('responseText').innerText = "Gagal mengirim. Coba lagi.";
+            }
+        });
+    </script>
+</body>
+
+</html>
