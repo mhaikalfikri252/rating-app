@@ -29,21 +29,27 @@
 
             <input type="hidden" name="emot" id="emotInput" required>
 
-            <label>Nama Pegawai:</label>
-            <select name="pegawai" required>
-                <option value="">-- Pilih Pegawai --</option>
-                <option value="Oni Indah Reflin">Oni Indah Reflin</option>
-                <option value="Maulidar">Maulidar</option>
-                <option value="Ella Putri Maghfira">Ella Putri Maghfira</option>
-                <option value="Fathur Maulana">Fathur Maulana</option>
-                <option value="Rizal Fahmi">Rizal Fahmi</option>
-                <option value="M Haikal Fikri">M Haikal Fikri</option>
-            </select>
-
-            <div id="foto-container">
-                <img id="foto-pegawai" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
-                    alt="Foto Pegawai" />
+            <label>Pilih Pegawai:</label>
+            <div class="pegawai-grid" id="pegawaiGrid">
+                <div class="pegawai-card" data-nama="Oni Indah Reflin">
+                    <img src="img/oni.png" alt="Oni Indah Reflin">
+                    <span>Oni Indah Reflin</span>
+                </div>
+                <div class="pegawai-card" data-nama="Maulidar">
+                    <img src="img/moli.png" alt="Maulidar">
+                    <span>Maulidar</span>
+                </div>
+                <div class="pegawai-card" data-nama="Ella Putri Maghfira">
+                    <img src="img/ella.png" alt="Ella Putri Maghfira">
+                    <span>Ella Putri Maghfira</span>
+                </div>
+                <div class="pegawai-card" data-nama="Fathur Maulana">
+                    <img src="img/fatur.png" alt="Fathur Maulana">
+                    <span>Fathur Maulana</span>
+                </div>
             </div>
+
+            <input type="hidden" name="pegawai" id="pegawaiInput" required>
 
             <label>Ulasan:</label>
             <textarea name="ulasan" rows="4" required></textarea>

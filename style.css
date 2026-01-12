@@ -193,21 +193,62 @@ button:disabled {
   }
 }
 
-#foto-container {
-  text-align: center;
+/* Style Grid Pegawai */
+/* Container utama untuk Grid 2x2 */
+.pegawai-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Kunci: 2 kolom sama rata */
+  gap: 15px; /* Jarak antar kartu */
   margin: 20px 0;
 }
 
-#foto-pegawai {
-  max-width: 150px;
-  height: auto;
-  object-fit: cover;
-  border-radius: 8px;
-  /* opsional: bisa juga 0 jika mau benar-benar kotak */
-  display: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+/* Kartu Pegawai */
+.pegawai-card {
+  border: 2px solid #eee;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
   transition: all 0.3s ease;
-  margin-left: auto;
-  margin-right: auto;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Pengaturan Foto Agar Besar dan Tidak Terpotong */
+.pegawai-card img {
+  width: 100%; /* Mengikuti lebar kartu */
+  height: 180px; /* Tinggi ditambah agar gambar lebih besar */
+  border-radius: 8px;
+  object-fit: cover; /* Mengisi area tanpa gepeng (fokus ke wajah) */
+  object-position: top; /* Memastikan bagian kepala tidak terpotong */
+  margin-bottom: 10px;
+}
+
+/* Nama Pegawai */
+.pegawai-card span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
   display: block;
+  min-height: 34px; /* Menjaga tinggi teks tetap sama jika ada nama panjang */
+}
+
+/* Efek saat dipilih */
+.pegawai-card.selected-card {
+  border-color: #388e3c;
+  background: #e8f5e9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02); /* Sedikit membesar saat dipilih */
+}
+
+/* Responsif untuk layar kecil agar tetap 2 kolom */
+@media (max-width: 400px) {
+  .pegawai-grid {
+    gap: 10px;
+  }
+  .pegawai-card img {
+    height: 140px; /* Sedikit dikecilkan di HP kecil agar tidak terlalu panjang */
+  }
 }
