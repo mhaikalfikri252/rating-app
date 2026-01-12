@@ -16,8 +16,32 @@ emotIcons.forEach((icon) => {
   });
 });
 
+const pegawaiCards = document.querySelectorAll(".pegawai-card");
+const pegawaiInput = document.getElementById("pegawaiInput");
+
+// Logika Klik Grid Pegawai
+pegawaiCards.forEach((card) => {
+  card.addEventListener("click", () => {
+    // Hapus class selected dari semua kartu
+    pegawaiCards.forEach((c) => c.classList.remove("selected-card"));
+
+    // Tambah class selected ke kartu yang diklik
+    card.classList.add("selected-card");
+
+    // Isi value ke hidden input agar bisa terkirim saat submit
+    pegawaiInput.value = card.dataset.nama;
+  });
+});
+
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
+
+  // Validasi tambahan untuk pegawai
+  if (!pegawaiInput.value) {
+    notif.textContent = "⚠️ Harap pilih pegawai!";
+    notif.className = "notif error";
+    return;
+  }
 
   if (!emotInput.value) {
     notif.textContent = "⚠️ Harap pilih ekspresi kepuasan!";
@@ -37,7 +61,7 @@ form.addEventListener("submit", async function (e) {
 
   const formData = new FormData();
   formData.append("emot", emotInput.value);
-  formData.append("pegawai", pegawai.value);
+  formData.append("pegawai", pegawaiInput.value); // Mengambil dari pegawaiInput
   formData.append("ulasan", ulasan.value);
 
   try {
@@ -54,11 +78,13 @@ form.addEventListener("submit", async function (e) {
       notif.textContent = "✅ Terima kasih atas penilaiannya!";
       notif.className = "notif success";
       form.reset();
+
+      // Reset UI
       emotIcons.forEach((i) => i.classList.remove("selected"));
+      pegawaiCards.forEach((c) => c.classList.remove("selected-card"));
       emotInput.value = "";
-      // Tambahkan ini:
-      fotoPegawai.src = "";
-      fotoPegawai.style.display = "none";
+      pegawaiInput.value = "";
+
       form.scrollIntoView({ behavior: "smooth" });
     } else {
       notif.textContent = "❌ Gagal mengirim data. Coba lagi.";
@@ -78,8 +104,6 @@ const fotoMap = {
   "Maulidar": "img/moli.png",
   "Ella Putri Maghfira": "img/ella.png",
   "Fathur Maulana": "img/fatur.png",
-  "Rizal Fahmi": "img/rizal.png",
-  "M Haikal Fikri": "img/haikal.png",
 };
 
 const selectPegawai = document.querySelector('select[name="pegawai"]');
